@@ -27,7 +27,6 @@
     - neovim
     - bat
     - thefuck
-    - lz4
     - imagemagick
 
 # 既に手動インストール済みのアプリをHomebrewで上書きしない
@@ -81,8 +80,6 @@
     path: "{{ item.font_path }}"
   loop:
     - { cask: "font-hack-nerd-font", font_path: "{{ ansible_facts.env.HOME }}/Library/Fonts/HackNerdFont-Regular.ttf" }
-    - { cask: "font-sf-pro", font_path: "/Library/Fonts/SF-Pro.ttf" }
-    - { cask: "font-sf-mono", font_path: "/Library/Fonts/SF-Mono-Regular.otf" }
   register: managed_fonts
 
 - name: Install missing Homebrew font casks

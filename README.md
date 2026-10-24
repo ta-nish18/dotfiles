@@ -13,7 +13,7 @@
 | Python開発 | Pyright、Ruff、プロジェクト内`.venv`の自動選択、現在ファイルの実行 |
 | MATLAB開発 | MATLAB Language Server、インストール済みMATLABの自動検出、`.m`ファイルの実行 |
 | LaTeX執筆 | BasicTeX、latexmk、VimTeX、TexLab、Skimによる継続コンパイルとPDF表示 |
-| 共通設定 | naviチートシート、Codex共通指示、Hack Nerd Font・SF Pro・SF Mono |
+| 共通設定 | naviチートシート、Codex共通指示、Hack Nerd Font |
 
 ## インストールされるアプリ
 
@@ -33,7 +33,7 @@
 | 用途 | ツール |
 | --- | --- |
 | 検索・移動 | `fzf`、`fd`、`ripgrep`、`zoxide` |
-| ファイル操作・表示 | `yazi`、`bat`、`unar`、`jq`、`poppler`、`lz4`、ImageMagick |
+| ファイル操作・表示 | `yazi`、`bat`、`unar`、`jq`、`poppler`、ImageMagick |
 | ターミナル補助 | `navi`、`figlet`、`thefuck` |
 | Git | `gh`、`lazygit` |
 | 開発環境 | `node`、`python`、`nvim`、`tree-sitter-cli` |

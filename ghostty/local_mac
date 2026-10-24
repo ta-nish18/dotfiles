@@ -5,6 +5,7 @@ theme = Dracula
 term = xterm-256color
 
 # フォントサイズ
+font-family = Hack Nerd Font
 font-size = 15
 
 # フォントスタイル
