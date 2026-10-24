@@ -1,5 +1,9 @@
 # テーマ設定
 theme = Dracula
+
+# SSH接続先との端末互換性を優先
+term = xterm-256color
+
 # フォントサイズ
 font-size = 15
 
