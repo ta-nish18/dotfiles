@@ -1,0 +1,47 @@
+#!/bin/sh
+set -eu
+
+dotfiles_dir=${1:-$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)}
+common_file="$dotfiles_dir/llm/common.md"
+generated_dir="$dotfiles_dir/llm/generated"
+
+/bin/mkdir -p "$generated_dir"
+
+render_instructions() {
+  specialization=$1
+  generated_file=$2
+  destination=$3
+  temporary_file=$(/usr/bin/mktemp "${TMPDIR:-/tmp}/dotfiles-llm.XXXXXX")
+  changed=false
+
+  {
+    /bin/cat "$common_file"
+    /usr/bin/printf '\n'
+    /bin/cat "$dotfiles_dir/llm/$specialization"
+  } > "$temporary_file"
+
+  if [ ! -f "$generated_file" ] || ! /usr/bin/cmp -s "$temporary_file" "$generated_file"; then
+    /bin/chmod 0644 "$temporary_file"
+    /bin/mv -f "$temporary_file" "$generated_file"
+    changed=true
+  else
+    /bin/rm -f "$temporary_file"
+  fi
+
+  /bin/mkdir -p "$(/usr/bin/dirname "$destination")"
+
+  if [ -L "$destination" ] || [ ! -f "$destination" ] || ! /usr/bin/cmp -s "$generated_file" "$destination"; then
+    /bin/rm -f "$destination"
+    /bin/cp "$generated_file" "$destination"
+    /bin/chmod 0644 "$destination"
+    changed=true
+  fi
+
+  if [ "$changed" = true ]; then
+    /usr/bin/printf 'Updated: %s\n' "$destination"
+  fi
+}
+
+render_instructions "codex.md" "$generated_dir/codex-AGENTS.md" "$HOME/.codex/AGENTS.md"
+render_instructions "claude.md" "$generated_dir/claude-CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+render_instructions "gemini.md" "$generated_dir/gemini-GEMINI.md" "$HOME/.gemini/GEMINI.md"

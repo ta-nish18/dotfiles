@@ -105,17 +105,9 @@
     force: yes
     follow: false
 
-# codex のリンク
-- name: Ensure Codex config directory exists
-  file:
-    path: "{{ ansible_facts.env.HOME }}/.codex"
-    state: directory
-    mode: "0755"
-
-# config.tomlはCodexアプリが管理するため、共通指示のAGENTS.mdだけをリンクする
-- name: Link Codex instructions
-  file:
-    src: "{{ dotfiles_dir }}/codex/AGENTS.md"
-    dest: "{{ ansible_facts.env.HOME }}/.codex/AGENTS.md"
-    state: link
-    force: yes
+# 共通指示と各LLMの専門指示を結合して、各ツールの標準パスへ配置する
+- name: Install LLM instructions
+  ansible.builtin.command:
+    cmd: "/bin/sh {{ dotfiles_dir }}/scripts/update-llm-instructions {{ dotfiles_dir }}"
+  register: llm_instructions
+  changed_when: "'Updated:' in llm_instructions.stdout"

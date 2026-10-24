@@ -26,3 +26,6 @@ id_ed25519.pub
 # Local caches and generated files
 __pycache__/
 *.pyc
+
+# Generated LLM instruction files
+llm/generated/

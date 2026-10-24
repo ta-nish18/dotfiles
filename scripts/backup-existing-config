@@ -7,17 +7,32 @@ backup_root="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles-backups/pre-dotfiles"
 backup_one() {
   source_path=$1
   relative_path=$2
+  managed_copy=${3:-}
+  destination="$backup_root/$relative_path"
+
+  if [ -n "$managed_copy" ] && [ -f "$source_path" ] && [ -f "$managed_copy" ] \
+    && /usr/bin/cmp -s "$source_path" "$managed_copy"; then
+    return 0
+  fi
 
   if [ -L "$source_path" ]; then
     link_target=$(/usr/bin/readlink "$source_path" || true)
     case "$link_target" in
       "$dotfiles_dir"|"$dotfiles_dir"/*) return 0 ;;
     esac
+
+    if [ -e "$destination" ] || [ -L "$destination" ]; then
+      return 0
+    fi
+
+    /bin/mkdir -p "$(/usr/bin/dirname "$destination")"
+    /bin/ln -s "$link_target" "$destination"
+    printf 'Backed up link: %s\n' "$source_path"
+    return 0
   elif [ ! -e "$source_path" ]; then
     return 0
   fi
 
-  destination="$backup_root/$relative_path"
   if [ -e "$destination" ] || [ -L "$destination" ]; then
     return 0
   fi
@@ -37,7 +52,9 @@ backup_one "$HOME/.config/ghostty" "config/ghostty"
 backup_one "$HOME/.config/sheldon" "config/sheldon"
 backup_one "$HOME/.config/nvim" "config/nvim"
 backup_one "$HOME/.local/share/navi/cheats/custom_cheats" "local/share/navi/cheats/custom_cheats"
-backup_one "$HOME/.codex/AGENTS.md" "codex/AGENTS.md"
+backup_one "$HOME/.codex/AGENTS.md" "codex/AGENTS.md" "$dotfiles_dir/llm/generated/codex-AGENTS.md"
+backup_one "$HOME/.claude/CLAUDE.md" "claude/CLAUDE.md" "$dotfiles_dir/llm/generated/claude-CLAUDE.md"
+backup_one "$HOME/.gemini/GEMINI.md" "gemini/GEMINI.md" "$dotfiles_dir/llm/generated/gemini-GEMINI.md"
 
 printf 'dotfiles=%s\n' "$dotfiles_dir" > "$backup_root/.complete"
-printf 'Initial backup: %s\n' "$backup_root"
+printf 'Backup directory: %s\n' "$backup_root"

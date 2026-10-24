@@ -13,7 +13,7 @@
 | Python開発 | Pyright、Ruff、プロジェクト内`.venv`の自動選択、現在ファイルの実行 |
 | MATLAB開発 | MATLAB Language Server、インストール済みMATLABの自動検出、`.m`ファイルの実行 |
 | LaTeX執筆 | BasicTeX、latexmk、VimTeX、TexLab、Skimによる継続コンパイルとPDF表示 |
-| 共通設定 | naviチートシート、Codex共通指示、Hack Nerd Font |
+| 共通設定 | naviチートシート、Codex・Claude Code・Gemini CLIの共通／専門指示、Hack Nerd Font |
 
 ## インストールされるアプリ
 
@@ -59,6 +59,12 @@
 
 LaTeXファイルでは`Space l c`で継続コンパイルを開始すると、以後は保存するたびにPDFが更新されます。`Space l v`でPDFを表示し、`Space l s`でコンパイラを停止します。
 
+## LLM指示
+
+`llm/common.md`を3つのLLMで共有し、Codexは実装・レビュー、Claude Codeは設計・仕様整理、Gemini CLIは調査・情報統合を専門指示として追加します。セットアップ時に内容を結合して、`~/.codex/AGENTS.md`、`~/.claude/CLAUDE.md`、`~/.gemini/GEMINI.md`へ配置します。
+
+これらはCodex、Claude Code、Gemini CLI向けの指示です。ClaudeおよびGeminiのデスクトップアプリに対する設定ではありません。
+
 ## セットアップ
 
 macOSの管理者権限とインターネット接続が必要です。リポジトリを任意の場所へ配置し、次を実行します。
@@ -82,7 +88,7 @@ TailscaleとGoogle Driveはインストールのみを行います。接続先�
 ~/.config/dotfiles-backups/pre-dotfiles/
 ```
 
-対象はZsh、Ghostty、Neovim、Codex、naviの設定です。バックアップは初回だけ作成し、再実行では上書きしません。その後、リポジトリ内の設定を各配置先へシンボリックリンクします。
+対象はZsh、Ghostty、Neovim、LLM指示、naviの設定です。各対象のバックアップは一度だけ作成し、再実行では上書きしません。その後、リポジトリ内の設定を各配置先へ反映します。
 
 ## リポジトリ構成
 
@@ -94,7 +100,7 @@ TailscaleとGoogle Driveはインストールのみを行います。接続先�
 | `ghostty/` | Ghosttyの共通・macOS設定 |
 | `sheldon/` | Zshプラグイン定義 |
 | `cheats/` | naviのカスタムチートシート |
-| `codex/` | Codex共通指示 |
+| `llm/` | 3つのLLMで共有する指示と各LLMの専門指示 |
 | `scripts/` | 既存設定のバックアップ処理 |
 
 ## 公開範囲
