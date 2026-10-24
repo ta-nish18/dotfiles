@@ -2,6 +2,11 @@
   connection: local
   gather_facts: yes
 
+  # パッケージ導入時に利用者固有のtapまで自動更新して、セットアップ全体が
+  # 巻き込まれることを防ぐ。通常のbrew updateには影響しない。
+  environment:
+    HOMEBREW_NO_AUTO_UPDATE: "1"
+
   # -K では become パスワードが変数として参照できず、caskのpkgインストーラ(sudo)に
   # 渡せないため、ここで一度だけ入力して become と cask の両方で使い回す
   vars_prompt:

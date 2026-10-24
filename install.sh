@@ -67,7 +67,7 @@ if [ "$os_name" = "Darwin" ]; then
 
   if ! command -v ansible-playbook >/dev/null 2>&1; then
     echo "Ansible not found. Installing with Homebrew..."
-    "$brew_bin" install ansible
+    HOMEBREW_NO_AUTO_UPDATE=1 "$brew_bin" install ansible
   else
     echo "Ansible is already installed."
   fi

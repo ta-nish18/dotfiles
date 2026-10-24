@@ -1,7 +1,3 @@
-- name: Update Homebrew
-  community.general.homebrew:
-    update_homebrew: yes
-
 # CUIのインストール
 - name: Install Homebrew Packages
   community.general.homebrew:
