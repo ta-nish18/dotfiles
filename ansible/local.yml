@@ -17,6 +17,8 @@
   vars:
     # リポジトリを~/dotfiles以外へ配置しても動作させる
     dotfiles_dir: "{{ playbook_dir | dirname }}"
+    # Homebrewの標準配置。Apple SiliconとIntel Macの両方に対応する。
+    homebrew_prefix: "{{ '/opt/homebrew' if ansible_facts['architecture'] == 'arm64' else '/usr/local' }}"
     ansible_become_password: "{{ sudo_password }}"
 
   tasks:

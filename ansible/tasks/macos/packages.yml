@@ -1,3 +1,33 @@
+# 旧構成ではtree-sitter-cliをnpmのグローバル領域へ導入していた。
+# Homebrew formulaへ移行する前に、競合する旧npm版だけを削除する。
+- name: Check legacy npm tree-sitter-cli
+  ansible.builtin.stat:
+    path: "{{ homebrew_prefix }}/lib/node_modules/tree-sitter-cli"
+  register: legacy_npm_tree_sitter
+
+- name: Check tree-sitter command link
+  ansible.builtin.stat:
+    path: "{{ homebrew_prefix }}/bin/tree-sitter"
+    follow: false
+  register: tree_sitter_command
+
+- name: Remove legacy npm tree-sitter command link
+  ansible.builtin.file:
+    path: "{{ homebrew_prefix }}/bin/tree-sitter"
+    state: absent
+  become: true
+  when:
+    - legacy_npm_tree_sitter.stat.exists
+    - tree_sitter_command.stat.islnk | default(false)
+    - (tree_sitter_command.stat.lnk_source | default('')) is search('/lib/node_modules/tree-sitter-cli/cli.js$')
+
+- name: Remove legacy npm tree-sitter-cli package
+  ansible.builtin.file:
+    path: "{{ homebrew_prefix }}/lib/node_modules/tree-sitter-cli"
+    state: absent
+  become: true
+  when: legacy_npm_tree_sitter.stat.exists
+
 # CUIのインストール
 - name: Install Homebrew Packages
   community.general.homebrew:
@@ -24,6 +54,7 @@
     - bat
     - thefuck
     - imagemagick
+    - tree-sitter-cli
 
 # 既に手動インストール済みのアプリをHomebrewで上書きしない
 - name: Check managed GUI applications
@@ -87,11 +118,3 @@
   loop_control:
     label: "{{ item.item.cask }}"
   when: not item.stat.exists
-
-- name: Install global npm packages
-  community.general.npm:
-    name: "{{ item }}"
-    global: yes
-    state: latest
-  loop:
-    - tree-sitter-cli
