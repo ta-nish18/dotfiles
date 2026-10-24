@@ -1,0 +1,11 @@
+# プロンプト設定
+
+# Git
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats '%F{cyan}(%b)%f '
+zstyle ':vcs_info:*' enable git
+setopt PROMPT_SUBST
+
+# ユーザー名、直近2階層のパス、Gitブランチ名を表示
+export PROMPT='%F{green}%n%f %2~ ${vcs_info_msg_0_}%# '

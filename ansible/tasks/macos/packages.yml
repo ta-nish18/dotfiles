@@ -1,0 +1,104 @@
+- name: Update Homebrew
+  community.general.homebrew:
+    update_homebrew: yes
+
+# CUIのインストール
+- name: Install Homebrew Packages
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - navi
+    - fzf
+    - figlet
+    - yazi
+    - ffmpegthumbnailer
+    - unar
+    - jq
+    - poppler
+    - fd
+    - ripgrep
+    - zoxide
+    - lazygit
+    - gh
+    - sheldon
+    - node
+    - python
+    - neovim
+    - bat
+    - thefuck
+    - lz4
+    - imagemagick
+
+# 既に手動インストール済みのアプリをHomebrewで上書きしない
+- name: Check managed GUI applications
+  ansible.builtin.stat:
+    path: "{{ item.app_path }}"
+  loop:
+    - { cask: "chatgpt", app_path: "/Applications/ChatGPT.app", min_macos: "13" }
+    - { cask: "claude", app_path: "/Applications/Claude.app", min_macos: "13" }
+    - { cask: "ghostty", app_path: "/Applications/Ghostty.app", min_macos: "13" }
+    - { cask: "zoom", app_path: "/Applications/zoom.us.app" }
+    - { cask: "google-gemini", app_path: "/Applications/Gemini.app", min_macos: "15", architectures: ["arm64"] }
+    - { cask: "zen", app_path: "/Applications/Zen.app" }
+    - { cask: "tailscale-app", app_path: "/Applications/Tailscale.app", min_macos: "13" }
+    - { cask: "google-drive", app_path: "/Applications/Google Drive.app", min_macos: "13" }
+    - { cask: "basictex", app_path: "/Library/TeX/texbin/pdflatex" }
+    - { cask: "skim", app_path: "/Applications/Skim.app" }
+  register: managed_gui_apps
+
+# pkg形式のcaskは内部でsudoを使うため、パスワードをSUDO_ASKPASS経由で渡す
+- name: Install missing Homebrew application casks
+  community.general.homebrew_cask:
+    name: "{{ item.item.cask }}"
+    state: present
+    sudo_password: "{{ (sudo_password | default('')) or omit }}"
+  loop: "{{ managed_gui_apps.results }}"
+  loop_control:
+    label: "{{ item.item.cask }}"
+  when:
+    - not item.stat.exists
+    - item.item.min_macos is not defined
+      or ansible_facts['distribution_version'] is version(item.item.min_macos, '>=')
+    - item.item.architectures is not defined
+      or ansible_facts['architecture'] in item.item.architectures
+
+- name: Check latexmk
+  ansible.builtin.stat:
+    path: /Library/TeX/texbin/latexmk
+  register: latexmk_executable
+
+- name: Install latexmk into BasicTeX
+  ansible.builtin.command:
+    cmd: /Library/TeX/texbin/tlmgr install latexmk
+  become: true
+  when:
+    - not ansible_check_mode
+    - not latexmk_executable.stat.exists
+
+- name: Check managed fonts
+  ansible.builtin.stat:
+    path: "{{ item.font_path }}"
+  loop:
+    - { cask: "font-hack-nerd-font", font_path: "{{ ansible_facts.env.HOME }}/Library/Fonts/HackNerdFont-Regular.ttf" }
+    - { cask: "font-sf-pro", font_path: "/Library/Fonts/SF-Pro.ttf" }
+    - { cask: "font-sf-mono", font_path: "/Library/Fonts/SF-Mono-Regular.otf" }
+  register: managed_fonts
+
+- name: Install missing Homebrew font casks
+  community.general.homebrew_cask:
+    name: "{{ item.item.cask }}"
+    state: present
+    sudo_password: "{{ (sudo_password | default('')) or omit }}"
+  loop: "{{ managed_fonts.results }}"
+  loop_control:
+    label: "{{ item.item.cask }}"
+  when: not item.stat.exists
+
+- name: Install global npm packages
+  community.general.npm:
+    name: "{{ item }}"
+    global: yes
+    state: latest
+  loop:
+    - tree-sitter-cli

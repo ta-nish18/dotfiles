@@ -1,0 +1,23 @@
+- hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  # -K では become パスワードが変数として参照できず、caskのpkgインストーラ(sudo)に
+  # 渡せないため、ここで一度だけ入力して become と cask の両方で使い回す
+  vars_prompt:
+    - name: sudo_password
+      prompt: "sudo password (becomeとHomebrew caskのインストールに使用)"
+      private: yes
+
+  vars:
+    # リポジトリを~/dotfiles以外へ配置しても動作させる
+    dotfiles_dir: "{{ playbook_dir | dirname }}"
+    ansible_become_password: "{{ sudo_password }}"
+
+  tasks:
+    - name: Run Common tasks
+      include_tasks: tasks/common/common.yml
+
+    - name: Run macOS tasks
+      include_tasks: tasks/macos/macos.yml
+      when: ansible_facts['os_family'] == "Darwin"

@@ -1,0 +1,9 @@
+# OSごとの設定ファイルを local という名前でリンク
+- name: Link Ghostty OS specific config as 'local'
+  file:
+    src: "{{ dotfiles_dir }}/{{ item.src }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/{{ item.dest }}"
+    state: link
+    force: yes
+  loop:
+    - { src: "ghostty/local_mac", dest: "ghostty/local" }

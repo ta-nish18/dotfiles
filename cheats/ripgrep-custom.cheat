@@ -1,0 +1,39 @@
+% rg
+
+# 基本検索
+rg "<pattern>"
+$ pattern: search pattern
+
+# ディレクトリ指定
+rg "<pattern>" "<path>"
+$ pattern: search pattern
+$ path: path (e.g. src)
+
+# rg: 大小無視
+rg -i "<pattern>
+$ pattern: search pattern"
+
+# 拡張子で絞る
+rg "<pattern>" -g '*.<ext>'
+$ pattern: search pattern
+$ ext: extension
+
+# 複数拡張子(ts/tsx)
+rg "<pattern>" -g '*.ts' -g '*.tsx'
+$ pattern: search pattern
+
+# 除外
+rg "<pattern>" -g '!*_test.go'
+$ pattern: search pattern
+
+# ヒットしたファイル名だけ
+rg -l "<pattern>"
+$ pattern: search pattern
+
+# ヒットしないファイル名だけ
+rg -L "<pattern>"
+$ pattern: search pattern
+
+# 前後行も表示(コンテキスト表示)
+rg -C 3 "<pattern>"
+$ pattern: saerch pattern

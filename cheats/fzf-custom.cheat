@@ -1,0 +1,23 @@
+% fzf
+
+# ファイルを選ぶ
+fd . | fzf
+
+% fzf, fd
+# プレビュー付きで選ぶ
+fd . | fzf --preview 'bat --style=numbers --color=always {}'
+
+# 選んだファイルを nvim で開く
+nvim $(fd . | fzf)
+
+# rg結果から選んで nvim で行ジャンプ
+rg -n "<pattern>" | fzf | awk -F: '{print "+"$2, $1}' | xargs nvim
+$ pattern: search pattern
+
+% fzf, git
+
+# ブランチを選んで checkout
+git branch --format='%(refname:short)' | fzf | xargs git checkout
+
+# コミットを選んで表示
+git log --oneline --decorate | fzf

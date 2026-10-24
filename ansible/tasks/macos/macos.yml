@@ -1,0 +1,7 @@
+- name: Run macOS tasks
+  include_tasks: "{{ include_file }}"
+  loop:
+    - "packages.yml"
+    - "links.yml"
+  loop_control:
+    loop_var: include_file

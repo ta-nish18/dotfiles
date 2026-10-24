@@ -1,0 +1,121 @@
+# ディレクトリ作成
+- name: Create common .config directories
+  file:
+    path: "{{ ansible_facts.env.HOME }}/.config/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - ghostty
+    - sheldon
+
+# navi用の特殊なディレクトリ作成
+- name: Create navi cheat directories
+  file:
+    path: "{{ ansible_facts.env.HOME }}/.local/share/navi/cheats"
+    state: directory
+    recurse: yes
+
+- name: Create the user executable directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+# .zsh*のリンク
+- name: Link zsh configuration files
+  file:
+    src: "{{ dotfiles_dir }}/shell/{{ item }}"
+    dest: "{{ ansible_facts.env.HOME }}/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - .zshrc
+    - .zsh_prompt
+    - .zsh_plugins
+
+# .hushlogin のリンク
+- name: Link .hushlogin
+  file:
+    src: "{{ dotfiles_dir }}/.hushlogin"
+    dest: "{{ ansible_facts.env.HOME }}/.hushlogin"
+    state: link
+    force: yes
+
+# .config 内へのリンク
+- name: Link config files
+  file:
+    src: "{{ dotfiles_dir }}/{{ item.src }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/{{ item.dest }}"
+    state: link
+    force: yes
+  loop:
+    # ファイル単体をリンクするもの
+    - { src: "ghostty/config", dest: "ghostty/config" }
+    - { src: "ghostty/keybindings", dest: "ghostty/keybindings" }
+    - { src: "sheldon/plugins.toml", dest: "sheldon/plugins.toml" }
+
+# 既存ディレクトリはbackup.ymlで退避済み。正しいリンクでない場合だけ置換する。
+- name: Inspect managed config directory links
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.config/{{ item.dest }}"
+    follow: false
+  loop:
+    - { src: "nvim", dest: "nvim" }
+  register: managed_config_directory_links
+
+- name: Remove config directories that are not linked to this repository
+  ansible.builtin.file:
+    path: "{{ item.stat.path }}"
+    state: absent
+  loop: "{{ managed_config_directory_links.results }}"
+  when: >-
+    item.stat.exists and
+    (not item.stat.islnk or item.stat.lnk_source != dotfiles_dir + '/' + item.item.src)
+
+- name: Link managed config directories
+  ansible.builtin.file:
+    src: "{{ dotfiles_dir }}/{{ item.src }}"
+    dest: "{{ ansible_facts.env.HOME }}/.config/{{ item.dest }}"
+    state: link
+    force: true
+    follow: false
+  loop:
+    - { src: "nvim", dest: "nvim" }
+
+# navi のリンク
+- name: Inspect the navi cheats link
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.local/share/navi/cheats/custom_cheats"
+    follow: false
+  register: navi_cheats_link
+
+- name: Remove navi cheats that are not linked to this repository
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.local/share/navi/cheats/custom_cheats"
+    state: absent
+  when: >-
+    navi_cheats_link.stat.exists and
+    (not navi_cheats_link.stat.islnk or navi_cheats_link.stat.lnk_source != dotfiles_dir + '/cheats')
+
+- name: Link navi cheats
+  file:
+    src: "{{ dotfiles_dir }}/cheats"
+    dest: "{{ ansible_facts.env.HOME }}/.local/share/navi/cheats/custom_cheats"
+    state: link
+    force: yes
+    follow: false
+
+# codex のリンク
+- name: Ensure Codex config directory exists
+  file:
+    path: "{{ ansible_facts.env.HOME }}/.codex"
+    state: directory
+    mode: "0755"
+
+# config.tomlはCodexアプリが管理するため、共通指示のAGENTS.mdだけをリンクする
+- name: Link Codex instructions
+  file:
+    src: "{{ dotfiles_dir }}/codex/AGENTS.md"
+    dest: "{{ ansible_facts.env.HOME }}/.codex/AGENTS.md"
+    state: link
+    force: yes

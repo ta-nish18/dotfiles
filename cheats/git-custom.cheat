@@ -1,0 +1,44 @@
+% git, push
+
+# 変更を全部ステージして、メッセージ付きでコミットしてPushまで一気にする
+git add . && git commit -m "<message>" && git push origin <current_branch>
+
+# <current_branch>: 今いるブランチ名を自動取得して埋め込む
+$ current_branch: git branch --show-current
+
+% git, branch
+# ローカルのブランチを選択して削除する
+git branch -D <branch_to_delete>
+
+# <branch_to_delete>: 全ブランチ一覧を表示して選ばせる（mainと現在ブランチは除外）
+$ branch_to_delete: git branch --format="%(refname:short)" | grep -v "main" | grep -v "$(git branch --show-current)"
+
+% git, reset
+# 直前のコミットを取り消す（ファイルの変更はそのまま残す / soft reset）
+git reset --soft HEAD^
+
+% git, log
+# ログを綺麗なグラフで見る
+git log --graph --all --format='%x09%C(cyan bold)%an%Creset%x09%C(yellow)%h%Creset %C(magenta reverse)%d%Creset %s'
+
+% git, diff
+
+# まだaddしていない変更（作業ツリー）の差分を見る
+git diff
+
+# 変更したファイル一覧を見る
+git diff --name-only
+
+# すでにaddした変更（ステージング）の差分を見る
+git diff --staged
+
+# 特定のファイルの差分を見る
+git diff <changed_file>
+
+# ２つのコミット間の差分を見る
+git diff <commit_old> <commit_new>
+
+# -- 変数定義 --
+$ changed_file: git diff --name-only
+$ commit_old: git log --oneline --color=always | head -n 20
+$ commit_new: git log --oneline --color=always | head -n 20

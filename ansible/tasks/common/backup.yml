@@ -1,0 +1,4 @@
+- name: Back up existing managed configuration before first convergence
+  ansible.builtin.command:
+    cmd: "/bin/sh {{ dotfiles_dir }}/scripts/backup-existing-config {{ dotfiles_dir }}"
+    creates: "{{ ansible_facts.env.HOME }}/.config/dotfiles-backups/pre-dotfiles/.complete"

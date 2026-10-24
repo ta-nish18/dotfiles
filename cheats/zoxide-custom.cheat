@@ -1,0 +1,12 @@
+% zoxide
+
+# よく行くディレクトリへ
+z "<query>"
+$ query: keyword
+
+# 候補一覧(ランキング)
+zoxide query -l
+
+% zoxide, fzf
+% 一覧からfzfで選んで移動
+cd "$(zoxide query -l | fzf)"

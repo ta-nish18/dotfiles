@@ -1,0 +1,32 @@
+% fd
+
+# 名前で検索
+fd "<name>"
+$ name: filename substring / regex
+
+# ディレクトリだけ
+fd -t d "<name>"
+$ name: directory name
+
+# ファイルだけ
+fd -t f "<name>"
+$ name: file name
+
+# fd: 拡張子で検索
+fd -e "<ext>"
+$ ext: extension (go/ts/tsx/lua...)
+
+# 隠しファイルも含める
+fd -H "<name>"
+$ name: name
+
+# .gitignore 無視
+fd -I "<name>"
+$ name: name
+
+# 除外して検索
+fd "<name>" -E node_modules -E dist -E .git
+$ name: name
+
+# 深さ制限(例: 2階層まで)
+fd . -d 2

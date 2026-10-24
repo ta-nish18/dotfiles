@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+
+dotfiles_dir=${1:?dotfiles directory is required}
+backup_root="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles-backups/pre-dotfiles"
+
+backup_one() {
+  source_path=$1
+  relative_path=$2
+
+  if [ -L "$source_path" ]; then
+    link_target=$(/usr/bin/readlink "$source_path" || true)
+    case "$link_target" in
+      "$dotfiles_dir"|"$dotfiles_dir"/*) return 0 ;;
+    esac
+  elif [ ! -e "$source_path" ]; then
+    return 0
+  fi
+
+  destination="$backup_root/$relative_path"
+  if [ -e "$destination" ] || [ -L "$destination" ]; then
+    return 0
+  fi
+
+  /bin/mkdir -p "$(/usr/bin/dirname "$destination")"
+  /bin/cp -a "$source_path" "$destination"
+  printf 'Backed up: %s\n' "$source_path"
+}
+
+/bin/mkdir -p "$backup_root"
+
+backup_one "$HOME/.zshrc" "home/.zshrc"
+backup_one "$HOME/.zsh_prompt" "home/.zsh_prompt"
+backup_one "$HOME/.zsh_plugins" "home/.zsh_plugins"
+backup_one "$HOME/.hushlogin" "home/.hushlogin"
+backup_one "$HOME/.config/ghostty" "config/ghostty"
+backup_one "$HOME/.config/sheldon" "config/sheldon"
+backup_one "$HOME/.config/nvim" "config/nvim"
+backup_one "$HOME/.local/share/navi/cheats/custom_cheats" "local/share/navi/cheats/custom_cheats"
+backup_one "$HOME/.codex/AGENTS.md" "codex/AGENTS.md"
+
+printf 'dotfiles=%s\n' "$dotfiles_dir" > "$backup_root/.complete"
+printf 'Initial backup: %s\n' "$backup_root"

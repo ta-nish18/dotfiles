@@ -1,0 +1,7 @@
+- name: Run Common tasks
+  include_tasks: "{{ include_file }}"
+  loop:
+    - "backup.yml"
+    - "links.yml"
+  loop_control:
+    loop_var: include_file

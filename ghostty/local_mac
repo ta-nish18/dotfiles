@@ -1,0 +1,49 @@
+# テーマ設定
+theme = Dracula
+# フォントサイズ
+font-size = 15
+
+# フォントスタイル
+font-style-bold = false
+font-style-italic = false
+
+# フォントの太さ for mac
+font-thicken = true
+font-thicken-strength = 1
+
+# 明るい色をより鮮明に
+alpha-blending = linear
+
+# セル幅とセル高
+adjust-cell-width = -1
+adjust-cell-height = 1
+
+# ブロックカーソルに変更 & 点滅無効
+shell-integration-features = no-cursor
+cursor-style = block
+cursor-style-blink = false
+
+# for mac
+# タイトルバー削除
+macos-titlebar-style = hidden
+
+# windowの影を削除
+macos-window-shadow = false
+
+# macでのアイコン設定
+macos-icon = holographic
+
+# 水平方向のパディング
+window-padding-x = 10
+
+# 垂直方向のパディング
+window-padding-y = 10
+
+# 背景透過度の設定
+background-opacity = 0.8
+
+# 前回のウィンドウサイズを記憶しない
+window-save-state = never
+
+# キーバインディングの設定
+config-file = keybindings
