@@ -73,15 +73,16 @@ function Set-DirectoryLink($source, $link, $backupPath) {
 # 外部コマンドの成否は終了コードで判定する。
 function Install-WingetPackage($id) {
   $ErrorActionPreference = 'Continue'
-  & winget list --id $id --exact --accept-source-agreements *> $null
+  # msstoreソースの接続エラーで全体が失敗しないよう、wingetソースだけを参照する
+  & winget list --id $id --exact --source winget --accept-source-agreements *> $null
   if ($LASTEXITCODE -eq 0) {
     Write-Host "Already installed: $id"
     return
   }
   Write-Host "Installing: $id"
-  & winget install --id $id --exact --silent --accept-package-agreements --accept-source-agreements
+  & winget install --id $id --exact --source winget --silent --accept-package-agreements --accept-source-agreements
   if ($LASTEXITCODE -ne 0) {
-    [void]$failures.Add("winget: $id")
+    [void]$failures.Add(("winget: {0} (exit code 0x{1:X8})" -f $id, $LASTEXITCODE))
   }
 }
 
