@@ -162,9 +162,10 @@ Set-DirectoryLink (Join-Path $dotfilesDir 'wezterm') (Join-Path $HOME '.config\w
 
 # プロフィールの場所はOneDriveのフォルダーリダイレクトで変わるため、pwsh自身に尋ねる。
 # ファイルのシンボリックリンクは権限が必要なので、リポジトリ内の設定を読み込むだけの1行を置く。
-$pwsh = Join-Path $env:ProgramFiles 'PowerShell\7\pwsh.exe'
-if (Test-Path -LiteralPath $pwsh) {
-  $profilePath = (& $pwsh -NoProfile -Command '$PROFILE.CurrentUserAllHosts').Trim()
+# wingetはMSIX版を選ぶことがあり、その場合pwshはProgram Files配下に入らないためPATHから探す。
+$pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
+if ($pwshCommand) {
+  $profilePath = (& $pwshCommand.Source -NoProfile -Command '$PROFILE.CurrentUserAllHosts').Trim()
   $profileContent = ". '$((Join-Path $dotfilesDir 'shell\profile.ps1').Replace("'", "''"))'`n"
   $current = if (Test-Path -LiteralPath $profilePath) { [IO.File]::ReadAllText($profilePath) } else { $null }
   if ($current -ne $profileContent) {
