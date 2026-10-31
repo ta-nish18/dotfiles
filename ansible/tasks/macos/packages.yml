@@ -72,6 +72,7 @@
     - { cask: "basictex", app_path: "/Library/TeX/texbin/pdflatex" }
     - { cask: "skim", app_path: "/Applications/Skim.app" }
     - { cask: "logi-options+", app_path: "/Applications/logioptionsplus.app" }
+    - { cask: "betterdisplay", app_path: "/Applications/BetterDisplay.app" }
   register: managed_gui_apps
 
 # pkg形式のcaskは内部でsudoを使うため、パスワードをSUDO_ASKPASS経由で渡す

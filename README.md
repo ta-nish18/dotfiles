@@ -27,7 +27,7 @@
 | コミュニケーション | Zoom |
 | ネットワーク・同期 | Tailscale、Google Drive（macOS 13以降） |
 | PDF | Skim |
-| 周辺機器 | Logi Options+ |
+| 周辺機器 | Logi Options+、BetterDisplay |
 
 ## インストールされるCLI
 
