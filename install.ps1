@@ -156,6 +156,32 @@ foreach ($package in $wingetPackages) {
 }
 Update-SessionPath
 
+# Logitech.OptionsPlusはportable形式で、wingetはインストーラーを配置するだけで本体を導入しない。
+function Test-LogiOptionsInstalled {
+  $uninstallKeys = @(
+    'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+    'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
+  )
+  $entry = Get-ItemProperty -Path $uninstallKeys -ErrorAction SilentlyContinue |
+    Where-Object { $_.DisplayName -like 'Logi Options*' }
+  return [bool]$entry -or (Test-Path -LiteralPath (Join-Path $env:ProgramFiles 'LogiOptionsPlus'))
+}
+
+if (-not (Test-LogiOptionsInstalled)) {
+  $logiInstaller = Get-Command logioptionsplus_installer -ErrorAction SilentlyContinue
+  if ($logiInstaller) {
+    Write-Host 'Installing Logi Options+...'
+    try {
+      Start-Process -FilePath $logiInstaller.Source -ArgumentList '/quiet', '/analytics', 'no' -Wait
+    } catch {
+      Write-Warning "Logi Options+ installer failed: $_"
+    }
+  }
+  if (-not (Test-LogiOptionsInstalled)) {
+    [void]$failures.Add('Logi Options+: application was not installed')
+  }
+}
+
 # 設定のリンク
 Set-DirectoryLink (Join-Path $dotfilesDir 'nvim') (Join-Path $env:LOCALAPPDATA 'nvim') 'localappdata\nvim'
 Set-DirectoryLink (Join-Path $dotfilesDir 'wezterm') (Join-Path $HOME '.config\wezterm') 'config\wezterm'
