@@ -2,6 +2,8 @@ return {
   {
     "3rd/image.nvim",
     build = false,
+    -- 端末サイズの取得にioctlを使うためWindowsでは動作しない
+    cond = vim.fn.has("win32") == 0,
     event = "VeryLazy",
     opts = {
       backend = "kitty",

@@ -119,6 +119,52 @@ TailscaleとGoogle Driveはインストールのみを行います。接続先�
 | `llm/` | 3つのLLMで共有する指示と各LLMの専門指示 |
 | `scripts/` | 既存設定のバックアップ処理 |
 | `mkssh.sh` | Tailscale経由のSSH鍵・接続設定 |
+| `install.ps1`、`mkssh.ps1` | Windows用のセットアップとSSH設定 |
+| `wezterm/`、`windows/`、`shell/profile.ps1` | Windows用のターミナル、navi、PowerShell設定 |
+
+## Windows版
+
+Windows 10/11向けのセットアップです。Ansibleの代わりに`install.ps1`、zshの代わりにPowerShell 7、Ghosttyの代わりにWezTermを使います。Neovim設定、naviチートシート、LLM指示はmacOSと共有します。
+
+まず通常権限のPowerShellでGitを導入し、新しいウィンドウでリポジトリを取得して実行します。ブラウザでダウンロードしたZIPではなく`git clone`を使ってください。
+
+```powershell
+winget install --id Git.Git --exact
+```
+
+```powershell
+git clone <このリポジトリのURL> dotfiles
+```
+
+```powershell
+cd dotfiles
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+CLIはScoop、GUIアプリはwingetで導入します。Scoopの制約により、管理者権限のPowerShellでは実行できません。既存の設定は`~/.config/dotfiles-backups/pre-dotfiles/`へ移動します。
+
+### macOS版との違い
+
+| macOS | Windows | 補足 |
+| --- | --- | --- |
+| Ansible / Homebrew | `install.ps1` / Scoop・winget | Ansibleの制御ノードはWindowsで動作しない |
+| Ghostty | WezTerm | Ghosttyに公式Windows版がない |
+| `super`+`h/j/k/l` | `Alt`+`h/j/k/l` | `Win`+`L`などはOSの予約キー。ペイン幅の均等化は未対応 |
+| zsh / sheldon | PowerShell 7 / PSReadLine・PSFzf | 履歴検索は部分一致ではなく前方一致 |
+| Skim | SumatraPDF | 逆検索は`nvim/`ではなくSumatraPDF側で設定する |
+| BasicTeX | MiKTeX、Perl | |
+| `ffmpegthumbnailer` | `ffmpeg`、`7zip` | yaziのプレビュー用 |
+
+次の機能はWindowsでは利用できません。
+
+- `thefuck`：Scoopに収録されていないため導入しません
+- BetterDisplay：Windows版がありません
+- image.nvim：`ioctl`に依存するため無効にしています（Markdown内の画像表示のみ影響）
+- naviチートの一部：`awk`、`xargs`、`grep`、`head`を使うチートはPowerShellでは動作しません
+
+### SSH接続
+
+各PCで`mkssh.ps1`を実行します。ホスト側は管理者のPowerShellが必要です。Windowsホストへの公開鍵はコピーできないため、クライアントに表示された公開鍵をホスト側の`mkssh.ps1`へ貼り付けます。OpenSSHサーバーはTailscale以外のネットワークからも到達できる設定で有効になります。
 
 ## 公開範囲
 

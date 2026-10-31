@@ -4,7 +4,10 @@ return {
     tag = "v2.17",
     lazy = false,
     init = function()
-      vim.g.vimtex_view_method = "skim"
+      -- WindowsではVimTeXの既定動作でSumatraPDFが使われる
+      if vim.fn.has("mac") == 1 then
+        vim.g.vimtex_view_method = "skim"
+      end
       vim.g.vimtex_compiler_method = "latexmk"
       vim.g.vimtex_quickfix_mode = 0
       vim.g.vimtex_compiler_latexmk = {

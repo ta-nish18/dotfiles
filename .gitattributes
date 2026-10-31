@@ -1,0 +1,2 @@
+# Windowsでcloneしてもbashスクリプトなどが壊れないよう、改行をLFに統一する
+* text=auto eol=lf

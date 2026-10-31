@@ -6,9 +6,14 @@ function M.install_path()
     return configured
   end
 
-  local patterns = vim.fn.has("mac") == 1
-      and { "/Applications/MATLAB_R*.app" }
-    or { "/usr/local/MATLAB/R*", "/opt/MATLAB/R*" }
+  local patterns
+  if vim.fn.has("mac") == 1 then
+    patterns = { "/Applications/MATLAB_R*.app" }
+  elseif vim.fn.has("win32") == 1 then
+    patterns = { "C:/Program Files/MATLAB/R*" }
+  else
+    patterns = { "/usr/local/MATLAB/R*", "/opt/MATLAB/R*" }
+  end
   local candidates = {}
 
   for _, pattern in ipairs(patterns) do
@@ -25,7 +30,7 @@ function M.executable()
     return nil
   end
 
-  local executable = install_path .. "/bin/matlab"
+  local executable = install_path .. (vim.fn.has("win32") == 1 and "/bin/matlab.exe" or "/bin/matlab")
   return vim.fn.executable(executable) == 1 and executable or nil
 end
 

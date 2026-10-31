@@ -8,8 +8,11 @@ end
 
 local function python_command(file)
   local root = vim.fs.root(0, { "pyproject.toml", ".git" })
-  local venv_python = root and (root .. "/.venv/bin/python") or nil
-  local python = venv_python and vim.fn.executable(venv_python) == 1 and venv_python or "python3"
+  local is_windows = vim.fn.has("win32") == 1
+  local venv_bin = is_windows and "/.venv/Scripts/python.exe" or "/.venv/bin/python"
+  local venv_python = root and (root .. venv_bin) or nil
+  local system_python = is_windows and "python" or "python3"
+  local python = venv_python and vim.fn.executable(venv_python) == 1 and venv_python or system_python
   return { python, file }
 end
 

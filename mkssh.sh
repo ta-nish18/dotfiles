@@ -81,13 +81,14 @@ setup_client() {
     || die "tailscale status に失敗しました。Tailscale にログインしているか確認してください。"
   [ -n "$status_lines" ] || die "接続できる他のデバイスが見つかりません。"
 
-  local -a ips names
+  local -a ips names oses
   local i=0 ip name os state
   printf '\n  %-3s %-16s %-24s %-8s %s\n' "No" "IP" "マシン名" "OS" "状態"
   while read -r ip name os state; do
     i=$((i + 1))
     ips[i]=$ip
     names[i]=$name
+    oses[i]=$os
     printf '  %-3s %-16s %-24s %-8s %s\n' "$i" "$ip" "$name" "$os" "${state:-}"
   done <<< "$status_lines"
   echo
@@ -108,10 +109,16 @@ setup_client() {
   remote_user=$(ask "接続先のユーザー名（接続先で whoami を実行すると分かります）" "$(whoami)")
 
   # 4. 公開鍵のコピー
-  info "公開鍵を $remote_user@$target_ip にコピーします（接続先のログインパスワードを聞かれます）"
-  if command -v ssh-copy-id >/dev/null 2>&1; then
+  if [ "${oses[choice]}" = "windows" ]; then
+    # Windowsホストはシェルと鍵の置き場所が異なるため、ホスト側のmkssh.ps1で登録する
+    info "接続先で mkssh.ps1 のホスト側を実行し、次の公開鍵を貼り付けてください:"
+    cat "$key_path.pub"
+    read -r -p "登録したら Enter を押してください: " _
+  elif command -v ssh-copy-id >/dev/null 2>&1; then
+    info "公開鍵を $remote_user@$target_ip にコピーします（接続先のログインパスワードを聞かれます）"
     ssh-copy-id -i "$key_path.pub" "$remote_user@$target_ip"
   else
+    info "公開鍵を $remote_user@$target_ip にコピーします（接続先のログインパスワードを聞かれます）"
     ssh "$remote_user@$target_ip" 'mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys' < "$key_path.pub"
   fi
 

@@ -1,0 +1,3 @@
+# Windowsではbashが前提にならないため、チートの実行にPowerShell 7を使う。
+shell:
+  command: pwsh
