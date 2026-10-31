@@ -27,6 +27,7 @@
 | コミュニケーション | Zoom |
 | ネットワーク・同期 | Tailscale、Google Drive（macOS 13以降） |
 | PDF | Skim |
+| 周辺機器 | Logi Options+ |
 
 ## インストールされるCLI
 
@@ -80,6 +81,21 @@ TailscaleとGoogle Driveはインストールのみを行います。接続先�
 
 ターミナルメッセージの初回既定値は`Hello`です。端末ごとの`~/.config/dotfiles/terminal-greeting`へ保存され、Gitでは管理されません。再セットアップ時にEnterだけを押すと現在値を維持します。
 
+## SSH接続のセットアップ（Tailscale経由）
+
+`install.sh`はTailscaleアプリに同梱されたCLIを`~/.local/bin/tailscale`から呼べるようにします。その後、各PCで次を実行します。
+
+```sh
+./mkssh.sh
+```
+
+最初に役割を選びます。
+
+- **ホスト（接続される側）**：SSHサーバー（macOSはリモートログイン）を有効化し、ユーザー名とTailscale IPを表示します。先にこちらを実行します。
+- **クライアント（接続する側）**：鍵ファイル名とパスフレーズを入力して鍵を作成し、`tailscale status`の一覧から接続先を選び、ユーザー名を入力して公開鍵をコピーします。最後に`ssh <id>`の`id`を決めると`~/.ssh/config`へ追記し、接続テストを行います。
+
+`~/.ssh/config`は追記前に`config.bak.<日時>`へ退避します。秘密鍵はリポジトリに含まれません。
+
 ## 既存設定の保護
 
 置換対象の既存設定は、初回適用時に次の場所へバックアップします。
@@ -102,6 +118,7 @@ TailscaleとGoogle Driveはインストールのみを行います。接続先�
 | `cheats/` | naviのカスタムチートシート |
 | `llm/` | 3つのLLMで共有する指示と各LLMの専門指示 |
 | `scripts/` | 既存設定のバックアップ処理 |
+| `mkssh.sh` | Tailscale経由のSSH鍵・接続設定 |
 
 ## 公開範囲
 

@@ -71,6 +71,7 @@
     - { cask: "google-drive", app_path: "/Applications/Google Drive.app", min_macos: "13" }
     - { cask: "basictex", app_path: "/Library/TeX/texbin/pdflatex" }
     - { cask: "skim", app_path: "/Applications/Skim.app" }
+    - { cask: "logi-options+", app_path: "/Applications/logioptionsplus.app" }
   register: managed_gui_apps
 
 # pkg形式のcaskは内部でsudoを使うため、パスワードをSUDO_ASKPASS経由で渡す
@@ -88,6 +89,23 @@
       or ansible_facts['distribution_version'] is version(item.item.min_macos, '>=')
     - item.item.architectures is not defined
       or ansible_facts['architecture'] in item.item.architectures
+
+# GUI版TailscaleはアプリにCLIを同梱しているがPATHには入らない。
+# アプリ内バイナリはシンボリックリンク経由だと正しく起動しないため、
+# 実体をexecする小さなラッパーを~/.local/binへ置く。
+- name: Check Tailscale bundled CLI
+  ansible.builtin.stat:
+    path: /Applications/Tailscale.app/Contents/MacOS/Tailscale
+  register: tailscale_bundled_cli
+
+- name: Install tailscale command wrapper
+  ansible.builtin.copy:
+    dest: "{{ ansible_facts.env.HOME }}/.local/bin/tailscale"
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+  when: tailscale_bundled_cli.stat.exists
 
 - name: Check latexmk
   ansible.builtin.stat:
